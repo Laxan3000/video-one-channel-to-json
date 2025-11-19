@@ -29,9 +29,10 @@ def rescale_frame(frame: cv.typing.MatLike) -> cv.typing.MatLike:
 
 def read_frames(cap: cv.VideoCapture) -> Generator[cv.typing.MatLike, None]:
     while cap.isOpened():
-        current_frame = cap.get(cv.CAP_PROP_POS_FRAMES)
-        if FRAME_SKIP and current_frame % FRAME_SKIP == FRAME_SKIP - 1:
-            cap.set(cv.CAP_PROP_POS_FRAMES, current_frame + SKIP_AMOUNT)
+        if FRAME_SKIP:
+            current_frame: float = cap.get(cv.CAP_PROP_POS_FRAMES)
+            if current_frame != 0 and current_frame % FRAME_SKIP == 0:
+                cap.set(cv.CAP_PROP_POS_FRAMES, current_frame + SKIP_AMOUNT)
         
         ret, frame = cap.read()
         
@@ -46,7 +47,7 @@ def read_frames(cap: cv.VideoCapture) -> Generator[cv.typing.MatLike, None]:
 
 
 def generate_json(generator: Generator[cv.typing.MatLike, None]) -> None:
-    json = "[\n\t"
+    json: str = "[\n\t"
     for frame in generator:
         #* Uncomment to see generation process
         # cv.imshow("Output", frame)
